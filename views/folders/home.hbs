@@ -1,0 +1,88 @@
+<div class="col md-4 mx-auto">
+    <div class="card">
+        <div class="card-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="col-md-4">
+                    <h3 class="usuario">Hola {{name}} {{lastname}}</h3>
+                    <h4 class="rol">{{position}}</h4>
+                    <h5 class="Carpeta"> {{foldername}}</h5>
+                </div>
+                {{!-- form donde esta establecido el buscador y el boton --}}
+                {{!-- <form class="form-inline md-form mr-auto mb-4 ">
+                    <input class="form-control mr-sm-1" type="text" placeholder="Buscar" aria-label="Search">
+                    <button class="btn-primary btn-rounded btn-sm my-0" type="submit"><i class="fas fa-search"></i></button>
+                </form> --}}
+                <div class="col-mx-auto"> 
+
+                    <form action="/api/folder/new?route={{ruta}}">
+                        <input type="hidden" name="prevfolder" value="{{folderid}}" >
+                        <input type="hidden" name="ruta" value="{{ruta}}" >
+                        <button type="submit" class="btn btn-primary ">Crear Carpeta</button>
+                        <a class="btn btn-primary" href="/api/file/new?route={{ruta}}">Subir Archivo</a>
+                        {{#if prev_folder}}
+                            <a class="btn btn-primary" href="/api/folder/home/{{prev_folder}}">Atrás</a>
+                            {{else}}
+                                <a class="btn btn-primary" href="/api/folder/home">Atrás</a>
+                        {{/if}}
+                    </form>
+                    {{!-- <a class="btn btn-primary" href="/api/folder/new?route={{ruta}}">Crear Carpeta</a> --}}
+
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="col">
+                <ul _id="carpetas" class="col">
+                    {{#each folders}}
+                    <div class="row-md-6 ">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+                        </svg>
+                        <a href="/api/folder/home/{{_id}}">{{name}}</a>
+                        <div class="float-right">
+                            <div class="btn-group">
+                                <a class="btn btn-dark" href="" role="button">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <button type="button" class="btn dropdown-toggle bg-dark text-white" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    ...
+                                </button>
+                                <div class="dropdown-menu">
+                                    <a class="dropdown-item" href="">Descripción</a>
+                                    <div class="dropdown-divider"></div>
+                                    <a class="dropdown-item" href=""> Eliminar</a>
+                                </div>
+                            </div>
+                        </div>
+                        <hr class="my-4">
+                    </div>
+                    {{/each}}
+                    {{#each files}}
+                    <div class="row-md-6">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        <div class="float-right">
+                            <div class="btn-group">
+                                <a class="btn btn-dark" href="/api/file/edit/{{_id}}" role="button">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <button type="button" class="btn dropdown-toggle bg-dark text-white" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    ...
+                                </button>
+                                <div class="dropdown-menu">
+                                    <a class="dropdown-item" href="/api/file/download/{{_id}}"> Descargar</a>
+                                    <div class="dropdown-divider"></div>
+                                    <a class="dropdown-item" href=""> Eliminar</a>
+                                </div>
+                            </div>
+                        </div>
+                        <a href="/api/file/view/{{_id}}">{{name}}</a>
+                        <hr class="my-4">
+                    </div>
+                    {{/each}}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
