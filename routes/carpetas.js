@@ -5,6 +5,7 @@ const Carpeta = require('../models/schemas/folder');
 const Archivo = require('../models/schemas/file');
 const fileSystem = require('fs');
 const router = express.Router();
+const {ftpNewFolder} = require('../ftp/ftp');
 
 
 router.get('/home', isAuthenticated, async(req, res) =>{
@@ -50,6 +51,9 @@ router.post('/new-folder', isAuthenticated, async(req, res)=>{
             } else {
                 console.log("Directorio creado en: "+ repoDir);
                 await createFolder(name, author, route, accesslvl, prev_folder);
+                console.log("El directorio es: "+ repoDir);
+                await ftpNewFolder(repoDir);
+
             }
         })
     }

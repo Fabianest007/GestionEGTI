@@ -7,6 +7,7 @@ const router = express.Router();
 const path = require('path');
 const fileSystem = require('fs');
 const file = require('../models/schemas/file');
+const { ftpNewFile }  = require('../ftp/ftp');
 
 router.get('/view/:id',isAuthenticated, async (req, res) =>{
     const file = await Archivo.findById(req.params.id).lean();
@@ -32,16 +33,21 @@ router.post('/new-file', isAuthenticated, async (req, res) =>{
     const splitname = EDFile.name.split(".");
     const extension = splitname[splitname.length-1];
     ruta = ruta + '/Repository' + route + '/'+ name;
-    const fileroute = ruta + '/' + name + '-v' + version + '.'+extension;
+    ftpRoute = '/Repository' + route + '/'+ name;
+    ftpFile = ftpRoute + '/' + name + '-v' + version + '.'+extension;
+    const fileRoute = ruta + '/' + name + '-v' + version + '.'+extension;
     createFolder(ruta);
     // ruta = ruta + '/Repository' + route + '/'+ EDFile.name;
-    EDFile.mv(fileroute, async err =>{
+    EDFile.mv(fileRoute, async err =>{
         if(err) {
             return res.status(500).send({message: err})
         }
         await createFile(name, author, route, accesslvl, description, extension, version);
+        await ftpNewFile(ftpRoute,ftpFile,fileRoute);
         res.redirect('/api/folder/home');
     });
+
+
 });
 
 router.get('/edit/:id',isAuthenticated, async (req, res) =>{
