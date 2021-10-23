@@ -36,16 +36,16 @@ const ftpNewFolder = async (route) => {
    client.mkdir(route, function(err){})
 }
 
-//Descarga el archivo desde el servidor FTP
-const ftpDownload = async () => {
-   let ruta = path.dirname(require.main.filename);
-   ruta = ruta + '/ftp/local/test.txt'
-   client.get('ejemplo.txt', function(err, stream){
+// Descarga el archivo desde el servidor FTP
+const ftpDownload = (fileRoute, saveRoute) => {
+   console.log("Descargando archivo desde FTP");
+   client.get(fileRoute, function(err, stream){
       if (err) console.log(err);
-      stream.once('close', function() { client.end(); });
-      stream.pipe(fs.createWriteStream(ruta));
+      stream.pipe(fs.createWriteStream( saveRoute ));
+      console.log("Termino de descargar");
    });
 }
+
 
 
 module.exports = {

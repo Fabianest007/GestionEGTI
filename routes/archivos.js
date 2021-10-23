@@ -7,7 +7,7 @@ const router = express.Router();
 const path = require('path');
 const fileSystem = require('fs');
 const file = require('../models/schemas/file');
-const { ftpNewFile }  = require('../ftp/ftp');
+const { ftpNewFile, ftpDownload }  = require('../ftp/ftp');
 
 router.get('/view/:id',isAuthenticated, async (req, res) =>{
     const file = await Archivo.findById(req.params.id).lean();
@@ -74,20 +74,39 @@ router.post('/edit-file/:id', isAuthenticated, async (req, res)=>{// si se le ca
     res.redirect('/api/folder/home');
 });
 
-router.get('/download/:id', isAuthenticated, async (req, res) => {
-    const archivo = await Archivo.findById(req.params.id);
+router.get('/download/:id', isAuthenticated,  async (req, res) => {
+    const archivo =  await Archivo.findById(req.params.id);
     const {version} = archivo;
     let ruta = path.dirname(require.main.filename);
     ruta = ruta + '/Repository' + archivo.route + '/' + archivo.name;
     const filename = archivo.name+'-v'+ version +'.'+archivo.file_type;
+    const fileRoute = '/Repository' + archivo.route + '/' + archivo.name + '/' + filename;
     ruta = ruta + '/'+filename;
-    res.download(ruta,filename, async err => {
-        if(err){
-            console.log(err);
-        } else{
-            console.log("Archivo descargado");
-        }
-    });
+
+    if (fileSystem.existsSync(ruta)){
+        
+        res.download(ruta,filename, async err => {
+            if(err){
+                console.log(err);
+            } else{
+                console.log("Archivo descargado");
+            }
+        });
+    } else {
+
+        await ftpDownload(fileRoute, ruta)
+
+        setTimeout(()=>{
+            res.download(ruta,filename, err => {
+                if(err){
+                    console.log(err);
+                } else{
+                    console.log("Archivo descargado");
+                }
+            });
+        },2000)
+
+    }
 });
 
 router.get('/version', isAuthenticated, async (req, res) => {
