@@ -7,6 +7,7 @@ const flash = require('connect-flash');
 const passport = require('passport');
 const fileupload = require('express-fileupload');
 const { dbConnection } = require('../database/dbconfig');
+const { ftpConnection } = require('../ftp/ftp');
 require('../config/passport');
 
 //duda: port usarlo sin this. cuando se termine la bd
@@ -22,6 +23,9 @@ class Server {
         //conectar a la base de datos
         this.conectarDB();
 
+        //conectar al servidor FTP
+        this.conectarFTP();
+
         //middlewares
         this.middlewares();
 
@@ -35,12 +39,15 @@ class Server {
             partialsDir : path.join(this.app.get('views'), 'partials'),
             extname: '.hbs'
         }));
-
         
     }
 
     async conectarDB(){
         await dbConnection();
+    }
+
+    async conectarFTP(){
+        await ftpConnection();
     }
     
     middlewares(){
