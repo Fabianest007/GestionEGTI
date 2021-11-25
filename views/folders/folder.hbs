@@ -1,0 +1,30 @@
+<div class="col-md-8 m-auto">
+    <div class="card">
+        <div class="card-header text-center">
+            <h1>Descripción de La Carpeta</h1>
+        </div>
+        <div class="card-body">
+            <div class="form-group">
+                <input type="text" name="" class="form-control" value="{{file.name}}" readonly> 
+            </div>
+            <div class="form-group">
+                <input type="text" name="author" class="form-control" value="{{file.author}}" readonly> 
+            </div>
+            <div class="form-group">
+                <input type="text" name="route" class="form-control" value="{{file.route}}" readonly>
+            </div>
+            <div class="form-group">
+                <input type="text" name="date" class="form-control" value="{{file.creation_date}}" readonly>
+            </div>
+            <div class="form-group">
+                <input type="text" name="description" class="form-control" value="{{file.description}}" readonly>
+            </div>
+            <div class="text-center">
+                <div class="form-group">
+                    <a href="/api/file/download/{{file._id}}" class="btn btn-primary "> Descargar</a>
+                    <a href="/api/file/update/{{file._id}}" class="btn btn-primary "> Actualizar</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
