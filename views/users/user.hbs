@@ -5,14 +5,22 @@
     </div>
     <div class="card-body">
         <div class="form-group">
-                <input type="text" name="" class="form-control" value="{{position}}" readonly> 
-            </div>
+            <h5 class="usuario">Posición: </h5>
+            <input type="text" name="" class="form-control" value="{{position}}" readonly> 
+        </div>
+        <div class="form-group">
+            <h5 class="usuario">Email: </h5>
+            <input type="text" name="author" class="form-control" value="{{email}}" readonly> 
+        </div>
+        <div class="form-group">
+            <h5 class="usuario">Nivel de Acceso: </h5>
+            <input type="text" name="route" class="form-control" value="{{accesslvl}}" readonly>
+        </div>
+        <div class="text-center">
             <div class="form-group">
-                <input type="text" name="author" class="form-control" value="{{email}}" readonly> 
+                <a href="/api/folder/home" class="btn btn-primary "> Volver</a>
             </div>
-            <div class="form-group">
-                <input type="text" name="route" class="form-control" value="{{accesslvl}}" readonly>
-            </div>
+        </div>
     </div>
 </div>
 </div>
