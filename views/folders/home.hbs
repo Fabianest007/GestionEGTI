@@ -8,25 +8,31 @@
                     <h5 class="Carpeta"> {{foldername}}</h5>
                 </div>
                 {{!-- form donde esta establecido el buscador y el boton --}}
-                {{!-- <form class="form-inline md-form mr-auto mb-4 ">
+                <form class="form-inline md-form mr-auto mb-4 ">
                     <input class="form-control mr-sm-1" type="text" placeholder="Buscar" aria-label="Search">
                     <button class="btn-primary btn-rounded btn-sm my-0" type="submit"><i class="fas fa-search"></i></button>
-                </form> --}}
+                </form>
                 <div class="col-mx-auto"> 
-
-                    <form action="/api/folder/new?route={{ruta}}">
-                        <input type="hidden" name="prevfolder" value="{{folderid}}" >
-                        <input type="hidden" name="ruta" value="{{ruta}}" >
-                        <button type="submit" class="btn btn-primary ">Crear Carpeta</button>
-                        <a class="btn btn-primary" href="/api/file/new?route={{ruta}}">Subir Archivo</a>
-                        {{#if prev_folder}}
-                            <a class="btn btn-primary" href="/api/folder/home/{{prev_folder}}">Atrás</a>
-                            {{else}}
-                                <a class="btn btn-primary" href="/api/folder/home">Atrás</a>
-                        {{/if}}
-                    </form>
+                    <div class="dropdown">
+                        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                            Nuevo
+                        </button>
+                        <div class="dropdown-menu">
+                            <form action="/api/folder/new?route={{ruta}}">
+                                <input type="hidden" name="prevfolder" value="{{folderid}}" >
+                                <input type="hidden" name="ruta" value="{{ruta}}" >
+                                <button type="submit" class="dropdown-item ">Crear Carpeta</button>
+                                <a class="dropdown-item" href="/api/file/new?route={{ruta}}">Subir Archivo</a>
+                                {{#if prev_folder}}
+                                    <a class="btn btn-primary" href="/api/folder/home/{{prev_folder}}">Atrás</a>
+                                    {{else}}
+                                        <div class="dropdown-divider"></div>
+                                        <a class="dropdown-item" href="/api/folder/home">Atrás</a>
+                                {{/if}}
+                            </form>
+                        </div>      
+                    </div>
                     {{!-- <a class="btn btn-primary" href="/api/folder/new?route={{ruta}}">Crear Carpeta</a> --}}
-
                 </div>
             </div>
         </div>
