@@ -10,10 +10,10 @@ const router = express.Router();
 
 router.get('/home', isAuthenticated, async(req, res) =>{
     ruta = '/home';
-    const {name , lastname, position, email , accesslvl} = req.user;
+    const {name , lastname, position, email , accesslvl, is_admin} = req.user;
     //const folders = await Carpeta.find({route: '/home'}).lean();
     const folders = await Carpeta.find({route: '/home', accesslvl:{$gte:accesslvl}}).sort({name:'asc'}).lean();
-    res.render('folders/home',{folders, ruta, name, lastname, position, email, accesslvl} );
+    res.render('folders/home',{folders, ruta, name, lastname, position, email, accesslvl, is_admin} );
 });
 
 router.get('/home/:id', isAuthenticated, async(req, res) => {
