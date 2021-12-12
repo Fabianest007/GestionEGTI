@@ -37,6 +37,10 @@ const userSchema = Schema({
         type: Number,
         require: [true, 'Todos los datos son obligatorios']
     },
+    is_admin: {
+        type: Boolean,
+        require: [true, 'Todos los datos son obligatorios']
+    },
 });
 
 userSchema.methods.encryptPassword = async(passwd) =>{

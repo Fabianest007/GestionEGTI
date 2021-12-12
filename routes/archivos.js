@@ -33,15 +33,17 @@ router.post('/new-file', isAuthenticated, async (req, res) =>{
     const extension = splitname[splitname.length-1];
     ruta = ruta + '/Repository' + route + '/'+ name;
     const fileroute = ruta + '/' + name + '-v' + version + '.'+extension;
-    createFolder(ruta);
-    // ruta = ruta + '/Repository' + route + '/'+ EDFile.name;
-    EDFile.mv(fileroute, async err =>{
-        if(err) {
-            return res.status(500).send({message: err})
-        }
-        await createFile(name, author, route, accesslvl, description, extension, version);
+    if(createFolder(ruta)){
+        EDFile.mv(fileroute, async err =>{
+            if(err) {
+                return res.status(500).send({message: err})
+            }
+            await createFile(name, author, route, accesslvl, description, extension, version);
+            res.redirect('/api/folder/home');
+        });
+    } else {
         res.redirect('/api/folder/home');
-    });
+    }
 });
 
 router.get('/edit/:id',isAuthenticated, async (req, res) =>{
@@ -75,28 +77,40 @@ router.get('/download/:id', isAuthenticated, async (req, res) => {
     ruta = ruta + '/Repository' + archivo.route + '/' + archivo.name;
     const filename = archivo.name+'-v'+ version +'.'+archivo.file_type;
     ruta = ruta + '/'+filename;
-    res.download(ruta,filename, async err => {
-        if(err){
-            console.log(err);
-        } else{
-            console.log("Archivo descargado");
-        }
-    });
+
+    if (fileSystem.existsSync(ruta)){      //Si existe el archivo, sirvelo
+        res.download(ruta,filename, err => {
+            if(err){
+                console.log(err);
+                res.redirect('/api/folder/home');
+            } else{console.log("Archivo "+ req.params.id +" descargado por el cliente");}
+        });
+    } else {                              //Sino, avisar que el archivo no existe en el servidor
+        console.log("El archivo " + req.params.id +" no puede ser descargado");
+        res.redirect('/api/file/view/'+req.params.id);
+    }
 });
 
 router.get('/version', isAuthenticated, async (req, res) => {
     let info = req.query.info;
+    console.log(info);
     info = info.split('|');
     let ruta = path.dirname(require.main.filename);
     ruta = ruta + '/Repository' + info[0]+ '/'+info[1];
     filename = info[1];
-    res.download(ruta,filename, async err => {
-        if(err){
-            console.log(err);
-        } else{
-            console.log("Archivo descargado");
-        }
-    });
+    if (fileSystem.existsSync(ruta)){
+        res.download(ruta,filename, async err => {
+            if(err){
+                console.log(err);
+            } else{
+                console.log("Archivo descargado");
+            }
+        });
+    } else {                         
+        console.log("El archivo " + filename +" no puede ser descargado");
+        res.redirect('/api/folder/home/');
+    }
+
 });
 
 router.get('/update/:id', isAuthenticated, async (req, res) =>{
@@ -130,10 +144,7 @@ router.post('/update-file/:id', isAuthenticated, async (req, res)=>{
         }
         res.redirect('/api/folder/home');
     });
-    
-
 });
-
 module.exports = router;
 
 async function createFile(name, author, route, accesslvl, description, extension, version){
@@ -154,7 +165,7 @@ async function createFile(name, author, route, accesslvl, description, extension
 function createFolder(ruta){
     if (fileSystem.existsSync(ruta)){
         console.log('La carpeta ya existe');
-        res.redirect('/api/folder/home');
+        return false;
     } else {
         fileSystem.mkdir(ruta, async(error) =>{
             if (error){
@@ -163,6 +174,7 @@ function createFolder(ruta){
                 console.log("Directorio creado en: "+ ruta);
             }
         });
+        return true;
     }
 };
 
@@ -193,12 +205,21 @@ function renameFilesAndFolders( oldname, newname ,route, version, file_type ) {
     let prevRoute = ruta + '/' + oldname;
     let newRoute = ruta + '/'+ newname;
 
-    fileSystem.renameSync( prevRoute, newRoute );
+    if (fileSystem.existsSync(prevRoute)){
+        fileSystem.renameSync( prevRoute, newRoute );
+    } else {
+        console.log("Error: No se puede editar, la ruta " + prevRoute + ", no existe en el respositorio en el servidor");
+        return;   
+    }
     
     //modificando el nombre de los archivos dentro de la carpeta
     for(let i=1; i<= version; i++){
         prevRoute = ruta + '/' + newname + '/' + oldname + '-v' + i + '.' + file_type; 
         newRoute = ruta + '/' + newname + '/' + newname + '-v' + i + '.' + file_type; 
-        fileSystem.renameSync( prevRoute, newRoute);
+        if (fileSystem.existsSync(prevRoute)){
+            fileSystem.renameSync( prevRoute, newRoute);
+        } else {
+            console.log("Error: No se puede editar, el archivo " + prevRoute + ", no existe en el respositorio en el servidor");
+        }
     }
 };

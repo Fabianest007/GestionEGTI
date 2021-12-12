@@ -27,13 +27,18 @@ router.get('/logout', (req, res) => {
     res.redirect('/');
 })
 
-router.get('/new', (req, res) =>{
-    res.render('users/new-user');
+router.get('/new', isAuthenticated, (req, res) =>{
+    const {is_admin} = req.user;
+    if(is_admin){
+        res.render('users/new-user');
+    } else {
+        res.redirect('/api/folder/home');
+    }
 });
 
 router.post('/new-user', async (req, res) =>{
-    const {name, lastname, position, email, passwd, confPasswd, accesslvl} = req.body;
-    const errors = [];                                                              //Validaciones manuales
+    const {name, lastname, position, email, passwd, confPasswd, accesslvl, is_admin} = req.body;
+    const errors = [];                                                                           //Validaciones manuales
     if(!name) errors.push({text: 'Por favor ingrese un nombre'});
     if(!lastname) errors.push({text: 'Por favor ingrese un apellido'});
     if(!position) errors.push({text: 'Por favor ingrese una posicion'});
@@ -52,7 +57,7 @@ router.post('/new-user', async (req, res) =>{
             req.flash('error','Este email ya está en uso');
             res.redirect('/api/user/new-user');
         }  else {
-            await createUser(name, lastname, position, email, passwd, accesslvl);
+            await createUser(name, lastname, position, email, passwd, accesslvl, is_admin);
             req.flash('success_msg', 'Usuario creado');
             res.redirect('/');
         }
@@ -86,8 +91,8 @@ router.delete('/delete/:id', async(req, res)=>{
     res.redirect('/api/user/show-users');
 })
 
-async function createUser(name,lastname,position,email,passwd,accesslvl){
-    const newUser = new Usuario({ name, lastname, position, email, passwd, accesslvl })
+async function createUser(name,lastname,position,email,passwd,accesslvl,is_admin){
+    const newUser = new Usuario({ name, lastname, position, email, passwd, accesslvl, is_admin })
     newUser.passwd = await newUser.encryptPassword(passwd);
     const result = await newUser.save();
     console.log("Se ha creado con exito el siguiente usuario: ",result);
