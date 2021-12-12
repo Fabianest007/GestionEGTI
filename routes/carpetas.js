@@ -77,7 +77,34 @@ router.get('/home/folder/:id', isAuthenticated, async(req, res) => {
     const folder_name = folder.name;
     const folder_accesslvl = folder.accesslvl;
     res.render('folders/folder', {folder_name, author, route, creation_date, folder_accesslvl, prev_folder, name , lastname, position, email , accesslvl} );
-})
+});
+
+
+router.post('/home/search', isAuthenticated, async(req, res)=>{
+    const {name , lastname, position, email , accesslvl} = req.user;
+    let {info} = req.body;
+    info = "/"+ info + "/";
+    const folders = await Carpeta.find(
+        { $text: { $search: info } },
+        { score: { $meta: "textScore"} },
+        { accesslvl:{$gte:accesslvl} }
+        ).sort({score: { $meta: "textScore" } } ).lean();
+
+    const files = await Archivo.find(
+        { $text: { $search: info } },
+        { score: { $meta: "textScore"} },
+        { accesslvl:{$gte:accesslvl} }
+        ).sort({score: { $meta: "textScore" } } ).lean();
+
+        let no_content = false
+        if (files.length != 0 || folders.length != 0){
+            no_content = false;
+        } else {
+            no_content = true;
+        }
+        res.render('folders/home', { folders, files, ruta, name, lastname, position, email, accesslvl, no_content });
+    
+});
 
 // router.post('/new-folder/:route', async(req, res)=>{
 //     const prevRoute = req.params.route;
