@@ -3,6 +3,7 @@ const { Schema, model} = require('mongoose');
 const fileSchema = Schema({
     name: {
         type: String,
+        text: true,
         require: true
     },
 
@@ -13,6 +14,7 @@ const fileSchema = Schema({
 
     author: {
         type: [String],
+        text: true,
         require: true
     },
 
