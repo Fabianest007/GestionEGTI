@@ -33,15 +33,17 @@ router.post('/new-file', isAuthenticated, async (req, res) =>{
     const extension = splitname[splitname.length-1];
     ruta = ruta + '/Repository' + route + '/'+ name;
     const fileroute = ruta + '/' + name + '-v' + version + '.'+extension;
-    createFolder(ruta);
-    // ruta = ruta + '/Repository' + route + '/'+ EDFile.name;
-    EDFile.mv(fileroute, async err =>{
-        if(err) {
-            return res.status(500).send({message: err})
-        }
-        await createFile(name, author, route, accesslvl, description, extension, version);
+    if(createFolder(ruta)){
+        EDFile.mv(fileroute, async err =>{
+            if(err) {
+                return res.status(500).send({message: err})
+            }
+            await createFile(name, author, route, accesslvl, description, extension, version);
+            res.redirect('/api/folder/home');
+        });
+    } else {
         res.redirect('/api/folder/home');
-    });
+    }
 });
 
 router.get('/edit/:id',isAuthenticated, async (req, res) =>{
@@ -163,7 +165,7 @@ async function createFile(name, author, route, accesslvl, description, extension
 function createFolder(ruta){
     if (fileSystem.existsSync(ruta)){
         console.log('La carpeta ya existe');
-        res.redirect('/api/folder/home');
+        return false;
     } else {
         fileSystem.mkdir(ruta, async(error) =>{
             if (error){
@@ -172,6 +174,7 @@ function createFolder(ruta){
                 console.log("Directorio creado en: "+ ruta);
             }
         });
+        return true;
     }
 };
 

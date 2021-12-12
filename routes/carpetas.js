@@ -4,15 +4,16 @@ const express = require('express');
 const Carpeta = require('../models/schemas/folder');
 const Archivo = require('../models/schemas/file');
 const fileSystem = require('fs');
+const { get } = require('mongoose');
 const router = express.Router();
 
 
 router.get('/home', isAuthenticated, async(req, res) =>{
     ruta = '/home';
-    const {name , lastname, position, email , accesslvl} = req.user;
+    const {name , lastname, position, email , accesslvl, is_admin} = req.user;
     //const folders = await Carpeta.find({route: '/home'}).lean();
     const folders = await Carpeta.find({route: '/home', accesslvl:{$gte:accesslvl}}).sort({name:'asc'}).lean();
-    res.render('folders/home',{folders, ruta, name, lastname, position, email, accesslvl} );
+    res.render('folders/home',{folders, ruta, name, lastname, position, email, accesslvl, is_admin} );
 });
 
 router.get('/home/:id', isAuthenticated, async(req, res) => {
@@ -41,19 +42,20 @@ router.post('/new-folder', isAuthenticated, async(req, res)=>{
     const repoDir = 'Repository'+ route + '/' + name;
     console.log(repoDir);
     if (fileSystem.existsSync(repoDir)){
-        console.log('La carpeta ya existe');
+        console.log('Error: la carpeta ' + repoDir + ' ya existe');
         res.redirect('/api/folder/home/' + prev_folder);
     } else {
         fileSystem.mkdir(repoDir, async(error) =>{
             if (error){
                 console.log(error.message);
+                res.redirect('/api/folder/home/' + prev_folder);
             } else {
                 console.log("Directorio creado en: "+ repoDir);
                 await createFolder(name, author, route, accesslvl, prev_folder);
+                res.redirect('/api/folder/home/' + prev_folder);
             }
         })
     }
-    res.redirect('/api/folder/home/' + prev_folder); //Recordar devolverlo a la carpeta de la que provenia
 });
 
 router.get('/home/folder/:id', isAuthenticated, async(req, res) => {
@@ -87,6 +89,7 @@ function listAccessLevel(accesslvl){
     if (accesslvl == 5){ levels= [ {number: '5', text: 'Nivel 5'} ] ; }
     return levels;
 };
+
 
 function renameFolder(oldname, route, newname,){
     let ruta = path.dirname(require.main.filename);
