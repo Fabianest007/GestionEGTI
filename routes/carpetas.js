@@ -82,7 +82,8 @@ router.get('/home/folder/:id', isAuthenticated, async(req, res) => {
 
 router.post('/home/search', isAuthenticated, async(req, res)=>{
     const {name , lastname, position, email , accesslvl} = req.user;
-    const {info} = req.body;
+    let {info} = req.body;
+    info = "/"+ info + "/";
     const folders = await Carpeta.find(
         { $text: { $search: info } },
         { score: { $meta: "textScore"} },
