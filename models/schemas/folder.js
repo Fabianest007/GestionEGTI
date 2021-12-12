@@ -3,11 +3,13 @@ const { Schema, model} = require('mongoose');
 const folderSchema = Schema({
     name: {
         type: String,
+        text: true,
         require: true
     },
 
     author: {
         type: String,
+        text: true,
         require: true
     },
 
