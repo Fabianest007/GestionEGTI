@@ -13,7 +13,13 @@ router.get('/home', isAuthenticated, async(req, res) =>{
     const {name , lastname, position, email , accesslvl, is_admin} = req.user;
     //const folders = await Carpeta.find({route: '/home'}).lean();
     const folders = await Carpeta.find({route: '/home', accesslvl:{$gte:accesslvl}}).sort({name:'asc'}).lean();
-    res.render('folders/home',{folders, ruta, name, lastname, position, email, accesslvl, is_admin} );
+    let no_content = false
+    if (folders != undefined){
+        no_content = false;
+    } else {
+        no_content = true;
+    }
+    res.render('folders/home',{folders, ruta, name, lastname, position, email, accesslvl, is_admin, no_content} );
 });
 
 router.get('/home/:id', isAuthenticated, async(req, res) => {
@@ -25,7 +31,13 @@ router.get('/home/:id', isAuthenticated, async(req, res) => {
     const ruta = folder.route + '/' + folder.name;
     const folders = await Carpeta.find({route: ruta, accesslvl:{$gte:accesslvl}}).sort({name:'asc'}).lean();
     const files = await Archivo.find({route: ruta, accesslvl:{$gte:accesslvl}}).sort({name:'asc'}).lean();
-    res.render('folders/home', { folders, files, ruta, name, lastname, position, email, accesslvl, foldername, folderid, prev_folder });
+    let no_content = false
+    if (files.length != 0 || folders.length != 0){
+        no_content = false;
+    } else {
+        no_content = true;
+    }
+    res.render('folders/home', { folders, files, ruta, name, lastname, position, email, accesslvl, foldername, folderid, prev_folder, no_content });
 });
 
 router.get('/new', isAuthenticated, (req, res) =>{
