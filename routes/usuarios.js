@@ -4,6 +4,7 @@ const Usuario = require('../models/schemas/user')
 const router = express.Router();
 const path = require('path');
 const passport = require('passport');
+const { isAuthenticated } = require('../helpers/auth');
 
 router.get('/', (req, res) =>{
     // res.sendFile(path.resolve(__dirname,'../public/P_InicioSesion/index.html'));
@@ -67,6 +68,11 @@ router.get('/show-users', async(req, res) => {
 router.get('/edit/:id', async(req, res)=>{
     const user = await Usuario.findById(req.params.id);
     res.render('users/edit-user', {user});
+});
+
+router.get('/user/info', isAuthenticated, async(req, res)=>{
+    const {name , lastname, position, email , accesslvl} = req.user;
+    res.render('users/user', { name, lastname, position, email, accesslvl });
 });
 
 router.put('/edit/:id', async(req, res) =>{

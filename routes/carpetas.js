@@ -60,6 +60,15 @@ router.post('/new-folder', isAuthenticated, async(req, res)=>{
     res.redirect('/api/folder/home/' + prev_folder); //Recordar devolverlo a la carpeta de la que provenia
 });
 
+router.get('/home/folder/:id', isAuthenticated, async(req, res) => {
+    const {name , lastname, position, email , accesslvl} = req.user;
+    const folder = await Carpeta.findById(req.params.id);
+    const {author, route, creation_date, prev_folder} = folder;
+    const folder_name = folder.name;
+    const folder_accesslvl = folder.accesslvl;
+    res.render('folders/folder', {folder_name, author, route, creation_date, folder_accesslvl, prev_folder, name , lastname, position, email , accesslvl} );
+})
+
 // router.post('/new-folder/:route', async(req, res)=>{
 //     const prevRoute = req.params.route;
 //     const {name, author, route, accesslvl} = req.body; //Recordar hacer las validaciones de estos campos
